@@ -1,0 +1,71 @@
+import random
+import sys
+from PySide6.QtCore import QSize
+from PySide6.QtGui import QImage, QIcon, QPixmap
+from PySide6.QtWidgets import QMainWindow, QApplication
+from ui.ui_guess import Ui_MainWindow
+class Guess(QMainWindow, Ui_MainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+        self.imgScissors=QImage("scissors.png")
+        self.imgRock=QImage("rock.png")
+        self.imgPaper=QImage("paper.png")
+        self.btnScissors.setIcon(QIcon(QPixmap(self.imgScissors)))
+        self.btnRock.setIcon(QIcon(QPixmap(self.imgRock)))
+        self.btnPaper.setIcon(QIcon(QPixmap(self.imgPaper)))
+
+        self.btnScissors.setIconSize(QSize(150, 150))
+        self.btnRock.setIconSize(QSize(150, 150))
+        self.btnPaper.setIconSize(QSize(150, 150))
+
+        self.btnScissors.clicked.connect(self.btn_click)
+        self.btnRock.clicked.connect(self.btn_click)
+        self.btnPaper.clicked.connect(self.btn_click)
+
+    def btn_click(self, event):
+        player=0
+        btn=self.sender()
+        if btn==self.btnScissors:
+            player=0
+            self.lblPlayer.setPixmap(QPixmap(self.imgScissors))
+        elif btn==self.btnRock:
+            player=1
+            self.lblPlayer.setPixmap(QPixmap(self.imgRock))
+        else:
+            player=2
+            self.lblPlayer.setPixmap(QPixmap(self.imgPaper))
+
+        #cmp=random.randint(0,2)
+        #底下是作弊程式, 贏的機會只有20%
+        r=random.random()
+        if r<0.2 : #平手
+            cmp=player
+        elif r<0.4:#一定讓你贏
+            if player==0:cmp=2
+            elif player==1:cmp=0
+            else: cmp=1
+        else:#一定讓你輸
+            if player==0:cmp=1
+            elif player==1:cmp=2
+            else: cmp=0
+
+        if cmp==0:
+            self.lblCmp.setPixmap(QPixmap(self.imgScissors))
+        elif cmp==1:
+            self.lblCmp.setPixmap(QPixmap(self.imgRock))
+        else:
+            self.lblCmp.setPixmap(QPixmap(self.imgPaper))
+
+        result=cmp-player
+        if result==0:
+            self.lblResult.setText("平手")
+        elif result==-1 or result==2:
+            self.lblResult.setText("You Win")
+        else:
+            self.lblResult.setText("你槓龜了")
+if __name__=="__main__":
+    app=QApplication(sys.argv)
+    window=Guess()
+    window.show()
+    app.exec()
